@@ -2,9 +2,9 @@
     <div class="header-content">
         <div class="header-content__info">
             <img src="/src/assets/images/app-icon.png" class="header-content__info-icon">
-            <div class="header-content__info-text">
+            <h1 class="header-content__info-text">
                 <strong>AppStarter.</strong> Best landing page for web and mobile apps 
-            </div>
+            </h1>
             <div class="header-content__info-buttons">
                 <button class="header-content__info-download">Download Now</button>
                 <button class="header-content__info-video">Watch Video</button>
@@ -18,7 +18,7 @@
     </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
     $primaryColor: #FFFFFF;
     $secondaryColor: #282B31;
 
