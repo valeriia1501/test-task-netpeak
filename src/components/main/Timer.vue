@@ -1,16 +1,21 @@
 <template>
     <div class="timer-container">
         <div class="timer-container__creator">
-            <input class="timer-container__creator-input" type="text" placeholder="Timer Name" v-model="name">
-            <button class="timer-container__creator-button" v-on:click="createTimer">Create Timer</button>
+            <input class="timer-container__creator-input" type="text" placeholder="Timer Name" v-model="name" v-on:keyup.enter="createTimer">
+            <button class="timer-container__creator-button" v-on:click="createTimer" >Create Timer</button>
         </div>
         <ul v-show="visible" class="timer-container__list">
             <li class="timer-container__list-li" v-for="(item, index) in timers" :key="index">
                 <p class="timer-container__list-li-name">{{item.name}}</p>
-                <p class="timer-container__list-li-time">00:00:00</p>
-                <button class="timer-container__list-li-pause">
+                <p class="timer-container__list-li-time">{{updateHours(index)}}:{{updateMinutes(index)}}:{{updateSeconds(index)}}</p>
+                <button class="timer-container__list-li-pause" v-on:click="stop(index)" v-show="!timers[index].pause">
                     <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path fill="#FFFFFF" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
+                    </svg>
+                </button>
+                <button class="timer-container__list-li-start" v-on:click="start(index)" v-show="timers[index].pause">
+                    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path fill="#FFFFFF" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
                     </svg>
                 </button>
                 <button class="timer-container__list-li-delete">
@@ -29,22 +34,60 @@ export default {
     name: 'timer',
     data() {
         return {
+            timer: '',
             name: '',
             timers: [],
-            visible: false
+            visible: false,
         }
     },
     methods: {
         createTimer() {
+            clearInterval(this.timer)
             this.visible = true;
-            // console.log(this.name);
-            // let date = new Date() + '';
-            // date.slice(0, 24);
             this.timers.unshift({
-                name: this.name || date
-            })
-            console.log(this.timers)
-
+                name: this.name || new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                seconds: 0,
+                minutes: 0,
+                hours: 0,
+                pause: false
+            }); 
+            console.log(this.timers);
+            this.timer = setInterval(() => this.startTimer('work'), 1000);
+        },
+        startTimer() {
+            for (let item of this.timers) {
+                if (!item.pause) {
+                    item.seconds++;
+                    if (item.seconds == 60) {
+                        item.minutes++;
+                        item.seconds = 0;
+                    }
+                    if (item.minutes == 60) {
+                        item.hours++;
+                        item.minutes = 0;
+                    }
+                }
+            }
+            
+        },
+        updateSeconds(index) {
+            return (this.timers[index].seconds < 10) ? '0' + this.timers[index].seconds : this.timers[index].seconds;
+        },
+        updateMinutes(index) {
+            return (this.timers[index].minutes < 10) ? '0' + this.timers[index].minutes : this.timers[index].minutes;
+        },
+        updateHours(index) {
+            return (this.timers[index].hours< 10) ? '0' + this.timers[index].hours : this.timers[index].hours;
+        },
+        stop(index) {
+            clearInterval(this.timer)
+            this.timer = setInterval(() => this.startTimer(), 1000); 
+            this.timers[index].pause = true;
+        },
+        start(index) {
+            clearInterval(this.timer);
+            this.timers[index].pause = false;
+            this.timer = setInterval(() => this.startTimer(), 1000); 
         }
     }
 }
@@ -122,6 +165,21 @@ export default {
                     margin-left: 6%;
                     margin-right: 10px;
                     background: linear-gradient(135deg, #7956EC 0%, #2FB9F8 100%);
+                    border-radius: 25px;
+                    border: none;
+                    display: flex;
+                    cursor: pointer;
+                    svg {
+                        margin: auto;
+                    }
+
+                }
+                &-start {
+                    width: 50px;
+                    height: 50px;
+                    margin-left: 6%;
+                    margin-right: 10px;
+                    background: linear-gradient(135deg, #009FC5 0%, #3CECB0 100%);
                     border-radius: 25px;
                     border: none;
                     display: flex;
