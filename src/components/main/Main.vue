@@ -1,5 +1,5 @@
 <template>
-    <div class="main-container">
+    <main class="main-container">
         <h1 class="main-container__h1"><strong>Why</strong> do we use it?</h1>
         <p class="main-container__text">
             This sounded nonsense to Alice, so she said nothing, 
@@ -7,7 +7,7 @@
             she lost sight of her in a moment.
         </p>
         <timer></timer>
-    </div>
+    </main>
 </template>
 
 <script>

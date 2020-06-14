@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <header>
         <div class="header-container">
             <header-nav></header-nav>
             <header-content></header-content>
         </div>
-    </div>
+    </header>
 </template>
 
 <script>
@@ -22,6 +22,7 @@ export default {
 
 <style scoped lang="scss">
     .header-container {
-        background-image: url(/src/assets/images/header-bg.png);
+        background: url(/src/assets/images/header-bg.png);
+        background-size: cover;
     }
 </style>

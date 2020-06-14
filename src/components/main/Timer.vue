@@ -1,13 +1,15 @@
 <template>
     <div class="timer-container">
         <div class="timer-container__creator">
-            <input class="timer-container__creator-input" type="text" placeholder="Timer Name" v-model="name" v-on:keyup.enter="createTimer">
+            <input class="timer-container__creator-input" type="text" placeholder="Timer Name" v-model="name" v-on:keyup.enter="createTimer" maxlength="19">
             <button class="timer-container__creator-button" v-on:click="createTimer" >Create Timer</button>
         </div>
         <ul v-show="visible" class="timer-container__list">
-            <li class="timer-container__list-li" v-for="(item, index) in timers" :key="index">
+            <li class="timer-container__list-li" v-for="(item, index) in timers" :key="index" v-show="timers[index].visibleTimer">
                 <p class="timer-container__list-li-name">{{item.name}}</p>
-                <p class="timer-container__list-li-time">{{updateHours(index)}}:{{updateMinutes(index)}}:{{updateSeconds(index)}}</p>
+                <p class="timer-container__list-li-time" v-bind:style="{ backgroundColor: timers[index].activeColor }">
+                    {{updateHours(index)}}:{{updateMinutes(index)}}:{{updateSeconds(index)}}
+                </p>
                 <button class="timer-container__list-li-pause" v-on:click="stop(index)" v-show="!timers[index].pause">
                     <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path fill="#FFFFFF" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
@@ -18,7 +20,7 @@
                         <path fill="#FFFFFF" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
                     </svg>
                 </button>
-                <button class="timer-container__list-li-delete">
+                <button class="timer-container__list-li-delete" v-on:click="deleteTimer(index)">
                     <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path fill="#FFFFFF" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
                     </svg>
@@ -49,10 +51,12 @@ export default {
                 seconds: 0,
                 minutes: 0,
                 hours: 0,
-                pause: false
+                pause: false,
+                activeColor: '#E7E8EA',
+                visibleTimer: true
             }); 
-            console.log(this.timers);
             this.timer = setInterval(() => this.startTimer('work'), 1000);
+            this.name = ''
         },
         startTimer() {
             for (let item of this.timers) {
@@ -66,9 +70,11 @@ export default {
                         item.hours++;
                         item.minutes = 0;
                     }
+                    if (item.hours == 100) {
+                        this.deleteTimer(this.timers.indexOf(item))
+                    }
                 }
-            }
-            
+            }    
         },
         updateSeconds(index) {
             return (this.timers[index].seconds < 10) ? '0' + this.timers[index].seconds : this.timers[index].seconds;
@@ -83,11 +89,24 @@ export default {
             clearInterval(this.timer)
             this.timer = setInterval(() => this.startTimer(), 1000); 
             this.timers[index].pause = true;
+            this.timers[index].activeColor = 'rgba(255, 72, 118, 0.15)'
         },
         start(index) {
             clearInterval(this.timer);
             this.timers[index].pause = false;
-            this.timer = setInterval(() => this.startTimer(), 1000); 
+            this.timer = setInterval(() => this.startTimer(), 1000);
+            this.timers[index].activeColor = '#E7E8EA'
+        },
+        deleteTimer(index) {
+            this.timers[index].visibleTimer = false;
+            for (let item of this.timers) {
+                if (item.visibleTimer == true) {
+                    break;
+                } 
+                if (item.visibleTimer == false && this.timers.indexOf(item) == this.timers.length - 1) {
+                    this.visible = false;
+                }
+            }
         }
     }
 }
@@ -131,6 +150,12 @@ export default {
                 color: #FFFFFF;
                 cursor: pointer;
             }
+            &-button:focus {
+                outline: none;
+            }
+            &-button:hover {
+                opacity: 0.8;
+            }
         }
         &__list {
             border-top: 2px solid #E7E8EA ;
@@ -149,8 +174,6 @@ export default {
                 }
                 &-time {
                     width: 18%;
-                    background: #E7E8EA;
-                    border: 1px solid #E7E8EA;
                     box-sizing: border-box;
                     border-radius: 6px;
                     font-weight: normal;
@@ -158,6 +181,9 @@ export default {
                     line-height: 50px;
                     color: #676C75;
                     text-align: center;
+                }
+                .pause {
+                    background: rgba(255, 72, 118, 0.15);
                 }
                 &-pause {
                     width: 50px;
@@ -174,6 +200,9 @@ export default {
                     }
 
                 }
+                &-pause:focus {
+                    outline: none;
+                }
                 &-start {
                     width: 50px;
                     height: 50px;
@@ -189,6 +218,9 @@ export default {
                     }
 
                 }
+                &-start:focus {
+                    outline: none;
+                }
                 &-delete {
                     width: 50px;
                     height: 50px;
@@ -201,6 +233,9 @@ export default {
                     svg {
                         margin: auto;
                     }
+                }
+                &-delete:focus {
+                    outline: none;
                 }
             }
         }
